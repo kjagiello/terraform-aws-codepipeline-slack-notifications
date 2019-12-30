@@ -1,0 +1,64 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  lint-terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Terraform
+        run: |
+          wget https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+          unzip terraform_${TF_VERSION}_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          rm terraform_${TF_VERSION}_linux_amd64.zip
+        env:
+          TF_VERSION: 0.12.18
+
+      - name: Install tflint
+        run: |
+          wget https://github.com/wata727/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip
+          unzip tflint_linux_amd64.zip
+          sudo mv tflint /usr/local/bin/
+          rm tflint_linux_amd64.zip
+        env:
+          TFLINT_VERSION: 0.13.2
+
+      - uses: actions/checkout@v1
+      - run: terraform fmt -check
+      - run: tflint .
+
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Install dependencies
+        run: pip install --pre flake8==3.7.8 black==19.3b0
+
+      - uses: actions/checkout@v1
+      - run: flake8
+      - run: black --check .
+
+  test-python:
+    runs-on: ubuntu-latest
+    env:
+      AWS_DEFAULT_REGION: eu-west-1
+    strategy:
+      matrix:
+        lambda:
+          - notifier
+    steps:
+      - name: Setup python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Install dependencies
+        run: pip install boto3==1.10.45
+
+      - uses: actions/checkout@v1
+      - run: python -m tests
+        working-directory: lambdas/${{ matrix.lambda }}
