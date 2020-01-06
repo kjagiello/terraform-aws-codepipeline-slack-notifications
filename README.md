@@ -2,7 +2,7 @@
 
 [![Github Actions](https://github.com/kjagiello/terraform-aws-codepipeline-slack-notifications/workflows/CI/badge.svg)](https://github.com/kjagiello/terraform-aws-codepipeline-slack-notifications/actions?workflow=CI)
 
-A terraform module to set up Slack notifications for your AWS CodePipelines.
+A terraform module to set up Slack notifications for your AWS CodePipelines. Available through the [Terraform registry](https://registry.terraform.io/modules/kjagiello/codepipeline-slack-notifications/aws).
 
 ![image](https://user-images.githubusercontent.com/74944/71839994-b660bf00-30bc-11ea-8e5e-4d8850da6900.png)
 
@@ -14,7 +14,8 @@ resource "aws_codepipeline" "example" {
 }
 
 module "codepipeline_notifications" {
-  source  = "git::https://github.com/kjagiello/terraform-aws-codepipeline-slack-notifications"
+  source  = "kjagiello/codepipeline-slack-notifications/aws"
+  version = "1.0.0"
 
   name          = "codepipeline-notifications"
   namespace     = "kjagiello"
