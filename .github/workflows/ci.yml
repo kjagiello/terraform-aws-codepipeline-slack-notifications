@@ -4,6 +4,10 @@ on: [push, pull_request]
 jobs:
   lint-terraform:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        terraform-version: [0.12.29, 0.13.4]
+        tflint-version: [0.20.2]
     steps:
       - name: Install Terraform
         run: |
@@ -12,7 +16,7 @@ jobs:
           sudo mv terraform /usr/local/bin/
           rm terraform_${TF_VERSION}_linux_amd64.zip
         env:
-          TF_VERSION: 0.12.18
+          TF_VERSION: ${{ matrix.terraform-version }}
 
       - name: Install tflint
         run: |
@@ -21,7 +25,7 @@ jobs:
           sudo mv tflint /usr/local/bin/
           rm tflint_linux_amd64.zip
         env:
-          TFLINT_VERSION: 0.13.2
+          TFLINT_VERSION: ${{ matrix.tflint-version }}
 
       - uses: actions/checkout@v1
       - run: terraform fmt -check
