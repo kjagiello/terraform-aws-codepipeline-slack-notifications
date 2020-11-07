@@ -21,7 +21,7 @@ resource "aws_sns_topic_subscription" "pipeline_updates" {
 }
 
 resource "aws_codestarnotifications_notification_rule" "pipeline_updates" {
-  count = length(var.codepipelines)
+  count       = length(var.codepipelines)
   detail_type = "FULL"
   event_type_ids = [
     "codepipeline-pipeline-pipeline-execution-failed",
@@ -31,12 +31,12 @@ resource "aws_codestarnotifications_notification_rule" "pipeline_updates" {
     "codepipeline-pipeline-pipeline-execution-succeeded",
     "codepipeline-pipeline-pipeline-execution-superseded",
   ]
-  name = "slackNotification${var.codepipelines[count.index].name}"
+  name     = "slackNotification${var.codepipelines[count.index].name}"
   resource = var.codepipelines[count.index].arn
 
   target {
     address = aws_sns_topic.pipeline_updates.arn
-    type = "SNS"
+    type    = "SNS"
   }
 }
 
@@ -47,7 +47,7 @@ resource "aws_sns_topic_policy" "pipeline_updates" {
 
 data "aws_iam_policy_document" "pipeline_updates_policy" {
   statement {
-    sid = "codestar-notification"
+    sid    = "codestar-notification"
     effect = "Allow"
     resources = [
       aws_sns_topic.pipeline_updates.arn
