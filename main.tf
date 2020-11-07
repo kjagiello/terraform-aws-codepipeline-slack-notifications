@@ -47,15 +47,21 @@ resource "aws_sns_topic_policy" "pipeline_updates" {
 
 data "aws_iam_policy_document" "pipeline_updates_policy" {
   statement {
-    effect  = "Allow"
-    actions = ["SNS:Publish"]
+    sid = "codestar-notification"
+    effect = "Allow"
+    resources = [
+      aws_sns_topic.pipeline_updates.arn
+    ]
 
     principals {
-      type        = "Service"
-      identifiers = ["events.amazonaws.com"]
+      identifiers = [
+        "codestar-notifications.amazonaws.com"
+      ]
+      type = "Service"
     }
-
-    resources = [aws_sns_topic.pipeline_updates.arn]
+    actions = [
+      "SNS:Publish"
+    ]
   }
 }
 
