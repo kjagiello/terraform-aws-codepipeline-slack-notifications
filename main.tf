@@ -1,5 +1,5 @@
 module "default_label" {
-  source     = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=tags/0.4.0"
+  source     = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=tags/0.5.0"
   namespace  = var.namespace
   stage      = var.stage
   name       = var.name
@@ -21,7 +21,7 @@ resource "aws_sns_topic_subscription" "pipeline_updates" {
 }
 
 resource "aws_codestarnotifications_notification_rule" "pipeline_updates" {
-  count = var.codepipelines
+  count = length(var.codepipelines)
   detail_type = "FULL"
   event_type_ids = [
     "codepipeline-pipeline-pipeline-execution-failed",
