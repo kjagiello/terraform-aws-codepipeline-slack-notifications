@@ -75,7 +75,7 @@ resource "aws_lambda_function" "pipeline_notification" {
   filename         = "${path.module}/lambdas/notifier.zip"
   function_name    = module.default_label.id
   role             = aws_iam_role.pipeline_notification.arn
-  runtime          = "python3.7"
+  runtime          = "python3.8"
   source_code_hash = data.archive_file.notifier_package.output_base64sha256
   handler          = "notifier.handler"
   timeout          = 10

@@ -135,7 +135,7 @@ class TestNotifier(unittest.TestCase):
                                 "title": "Code revision",
                                 "value": (
                                     "commit message\n\n"
-                                    "<http://foo.bar|See on GitHub>"
+                                    "<http://foo.bar|View the changeset>"
                                 ),
                             },
                         ],
