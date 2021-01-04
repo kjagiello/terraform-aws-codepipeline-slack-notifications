@@ -1,9 +1,9 @@
 import json
 import logging
 import os
+import typing as t
 import urllib
 import urllib.request
-import typing as t
 
 import boto3
 
@@ -31,16 +31,24 @@ def format_slack_attachment(
     execution_id: str,
     environment: str,
     region: str,
-    revision_summary: str,
-    revision_url: str,
-) -> t.List[dict]:
+    revision_summary: t.Optional[str],
+    revision_url: t.Optional[str],
+) -> dict:
     execution_link = (
         f"<https://{region}.console.aws.amazon.com/codesuite/codepipeline/"
         f"pipelines/{pipeline_name}/executions/{execution_id}/timeline"
         f"?region={region}|{execution_id}>"
     )
-    # TODO: rename the revision link (it does not need to be GH)
-    # TODO: act accordingly if not revision_url
+    if revision_summary:
+        revision_link = (
+            f"\n\n<{revision_url}|View the changeset>" if revision_url else ""
+        )
+        revision = [
+            {
+                "title": "Code revision",
+                "value": f"{revision_summary}{revision_link}",
+            },
+        ]
     return {
         "color": STATE_COLORS[pipeline_state],
         "fallback": (f"`{pipeline_name}` has `{pipeline_state}`"),
@@ -49,10 +57,7 @@ def format_slack_attachment(
             {"title": "Execution ID", "value": execution_link},
             {"title": "Environment", "value": environment.upper(), "short": True},
             {"title": "Region", "value": region, "short": True},
-            {
-                "title": "Code revision",
-                "value": f"{revision_summary}\n\n<{revision_url}|See on GitHub>",
-            },
+            *revision,
         ],
     }
 
@@ -75,8 +80,8 @@ def build_slack_message_from_event(event):
         pipelineName=pipeline_name, pipelineExecutionId=execution_id
     )["pipelineExecution"]
     revision = pipeline_execution["artifactRevisions"][0]
-    revision_url = revision["revisionUrl"]
-    revision_summary = revision["revisionSummary"]
+    revision_url = revision.get("revisionUrl")
+    revision_summary = revision.get("revisionSummary")
 
     # Build a message with an attachment with details
     text = format_slack_text(pipeline_name=pipeline_name, pipeline_state=pipeline_state)
