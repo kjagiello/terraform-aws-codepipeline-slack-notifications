@@ -1,5 +1,5 @@
 module "default_label" {
-  source     = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=tags/0.4.0"
+  source     = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=tags/0.5.0"
   namespace  = var.namespace
   stage      = var.stage
   name       = var.name
@@ -20,29 +20,24 @@ resource "aws_sns_topic_subscription" "pipeline_updates" {
   endpoint  = aws_lambda_function.pipeline_notification.arn
 }
 
-resource "aws_cloudwatch_event_rule" "pipeline_updates" {
-  name        = local.subscription_name
-  description = "Captures CodePipeline state changes."
+resource "aws_codestarnotifications_notification_rule" "pipeline_updates" {
+  count       = length(var.codepipelines)
+  detail_type = "FULL"
+  event_type_ids = [
+    "codepipeline-pipeline-pipeline-execution-failed",
+    "codepipeline-pipeline-pipeline-execution-canceled",
+    "codepipeline-pipeline-pipeline-execution-started",
+    "codepipeline-pipeline-pipeline-execution-resumed",
+    "codepipeline-pipeline-pipeline-execution-succeeded",
+    "codepipeline-pipeline-pipeline-execution-superseded",
+  ]
+  name     = "slackNotification${var.codepipelines[count.index].name}"
+  resource = var.codepipelines[count.index].arn
 
-  event_pattern = <<EOF
-{
-  "source": [
-    "aws.codepipeline"
-  ],
-  "detail-type": [
-    "CodePipeline Pipeline Execution State Change"
-  ],
-  "detail": {
-    "pipeline": ${jsonencode(var.codepipelines.*.name)}
+  target {
+    address = aws_sns_topic.pipeline_updates.arn
+    type    = "SNS"
   }
-}
-EOF
-}
-
-resource "aws_cloudwatch_event_target" "pipeline_updates" {
-  target_id = local.subscription_name
-  rule      = aws_cloudwatch_event_rule.pipeline_updates.name
-  arn       = aws_sns_topic.pipeline_updates.arn
 }
 
 resource "aws_sns_topic_policy" "pipeline_updates" {
@@ -52,15 +47,21 @@ resource "aws_sns_topic_policy" "pipeline_updates" {
 
 data "aws_iam_policy_document" "pipeline_updates_policy" {
   statement {
-    effect  = "Allow"
-    actions = ["SNS:Publish"]
+    sid    = "codestar-notification"
+    effect = "Allow"
+    resources = [
+      aws_sns_topic.pipeline_updates.arn
+    ]
 
     principals {
-      type        = "Service"
-      identifiers = ["events.amazonaws.com"]
+      identifiers = [
+        "codestar-notifications.amazonaws.com"
+      ]
+      type = "Service"
     }
-
-    resources = [aws_sns_topic.pipeline_updates.arn]
+    actions = [
+      "SNS:Publish"
+    ]
   }
 }
 
