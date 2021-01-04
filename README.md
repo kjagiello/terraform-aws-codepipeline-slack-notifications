@@ -28,6 +28,26 @@ module "codepipeline_notifications" {
 }
 ```
 
+Beware that during the initial apply, it might fail with following error:
+
+> Error: error creating codestar notification rule: ConfigurationException: AWS
+> CodeStar Notifications could not create the AWS CloudWatch Events managed
+> rule in your AWS account. If this is your first time creating a notification
+> rule, the service-linked role for AWS CodeStar Notifications might not yet
+> exist. Creation of this role might take up to 15 minutes. Until it exists,
+> notification rule creation will fail. Wait 15 minutes, and then try again. If
+> this is is not the first time you are creating a notification rule, there
+> might be a problem with a network connection, or one or more AWS services
+> might be experiencing issues. Verify your network connection and check to see
+> if there are any issues with AWS services in your AWS Region before trying
+> again.
+
+This is due to this module using [AWS CodeStar](https://aws.amazon.com/codestar/)
+for subscribing to the CodePipeline state changes. The first use of a CodeStar
+resource automatically creates the required service-linked role, which
+typically is nearly instantaneous. Just reapply your Terraform plan and you
+should be good to go.
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Inputs
 
