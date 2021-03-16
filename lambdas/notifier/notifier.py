@@ -62,10 +62,7 @@ def format_slack_attachment(
     }
 
 
-def format_slack_text(*,
-                      pipeline_name: str,
-                      pipeline_state: str,
-                      action: str = "Deployment"):
+def format_slack_text(*, pipeline_name: str, pipeline_state: str, action: str):
     return f"*{action}* of *{pipeline_name}* has {pipeline_state.lower()}."
 
 
@@ -75,7 +72,7 @@ def build_slack_message_from_event(event):
     region = message["region"]
     pipeline_name = message["detail"]["pipeline"]
     pipeline_state = message["detail"]["state"]
-    pipeline_action = message["detail"].get('action')
+    pipeline_action = message["detail"].get("action")
     execution_id = message["detail"]["execution-id"]
 
     # Retrieve extra information about the pipeline run
@@ -88,9 +85,11 @@ def build_slack_message_from_event(event):
     revision_summary = revision.get("revisionSummary")
 
     # Build a message with an attachment with details
-    text = format_slack_text(pipeline_name=pipeline_name,
-                             pipeline_state=pipeline_state,
-                             action=pipeline_action)
+    text = format_slack_text(
+        pipeline_name=pipeline_name,
+        pipeline_state=pipeline_state,
+        action=pipeline_action or "Deployment",
+    )
     attachment = format_slack_attachment(
         pipeline_name=pipeline_name,
         pipeline_state=pipeline_state,
