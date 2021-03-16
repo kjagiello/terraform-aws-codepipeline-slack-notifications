@@ -14,13 +14,13 @@ variable "stage" {
 }
 
 variable "attributes" {
-  type        = list
+  type        = list(any)
   description = "List of attributes to add to label"
   default     = []
 }
 
 variable "codepipelines" {
-  type        = list
+  type        = list(any)
   description = "CodePipeline resources that should trigger Slack notifications"
 }
 
@@ -47,7 +47,7 @@ variable "slack_emoji" {
 }
 
 variable "event_type_ids" {
-  type = list
+  type        = list(any)
   description = "The list of event type to trigger a notification on"
   default = [
     "codepipeline-pipeline-pipeline-execution-failed",
