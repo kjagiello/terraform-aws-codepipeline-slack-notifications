@@ -45,3 +45,16 @@ variable "slack_emoji" {
   description = "The emoji avatar of the user that sends the notifications"
   default     = ":rocket:"
 }
+
+variable "event_type_ids" {
+  type = list
+  description = "The list of event type to trigger a notification on"
+  default = [
+    "codepipeline-pipeline-pipeline-execution-failed",
+    "codepipeline-pipeline-pipeline-execution-canceled",
+    "codepipeline-pipeline-pipeline-execution-started",
+    "codepipeline-pipeline-pipeline-execution-resumed",
+    "codepipeline-pipeline-pipeline-execution-succeeded",
+    "codepipeline-pipeline-pipeline-execution-superseded"
+  ]
+}
