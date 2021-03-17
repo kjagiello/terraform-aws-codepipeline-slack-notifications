@@ -112,7 +112,7 @@ class TestNotifier(unittest.TestCase):
                 "channel": "#notifications",
                 "username": "Mr. Robot",
                 "icon_emoji": ":rocket:",
-                "text": "Deployment of *kjagiello-qa-homepage* has started.",
+                "text": "*Deployment* of *kjagiello-qa-homepage* has started.",
                 "attachments": [
                     {
                         "color": "#1a9edb",
