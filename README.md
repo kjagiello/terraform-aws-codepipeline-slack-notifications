@@ -48,19 +48,41 @@ resource automatically creates the required service-linked role, which
 typically is nearly instantaneous. Just reapply your Terraform plan and you
 should be good to go.
 
+# Module documentation
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12 |
+| archive | ~> 1.3 |
+| aws | ~> 2.70 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| archive | ~> 1.3 |
+| aws | ~> 2.70 |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|:----:|:-----:|:-----:|
-| attributes | List of attributes to add to label | list | `[]` | no |
-| codepipelines | CodePipeline resources that should trigger Slack notifications | list | n/a | yes |
-| name | Name \(unique identifier for app or service\) | string | n/a | yes |
-| namespace | Namespace \(e.g. `skynet`\) | string | n/a | yes |
-| slack\_channel | A slack channel to send the deployment notifications to | string | n/a | yes |
-| slack\_emoji | The emoji avatar of the user that sends the notifications | string | `":rocket:"` | no |
-| slack\_url | Slack webhook URL for deploy notifications | string | n/a | yes |
-| slack\_username | The name of the user that sends the notifications | string | `"Deploy Bot"` | no |
-| stage | Stage \(e.g. `prod`, `dev`, `staging`\) | string | n/a | yes |
+|------|-------------|------|---------|:--------:|
+| attributes | List of attributes to add to label | `list(any)` | `[]` | no |
+| codepipelines | CodePipeline resources that should trigger Slack notifications | `list(any)` | n/a | yes |
+| event\_type\_ids | The list of event type to trigger a notification on | `list(any)` | <pre>[<br>  "codepipeline-pipeline-pipeline-execution-failed",<br>  "codepipeline-pipeline-pipeline-execution-canceled",<br>  "codepipeline-pipeline-pipeline-execution-started",<br>  "codepipeline-pipeline-pipeline-execution-resumed",<br>  "codepipeline-pipeline-pipeline-execution-succeeded",<br>  "codepipeline-pipeline-pipeline-execution-superseded"<br>]</pre> | no |
+| name | Name (unique identifier for app or service) | `string` | n/a | yes |
+| namespace | Namespace (e.g. `skynet`) | `string` | n/a | yes |
+| slack\_channel | A slack channel to send the deployment notifications to | `string` | n/a | yes |
+| slack\_emoji | The emoji avatar of the user that sends the notifications | `string` | `":rocket:"` | no |
+| slack\_url | Slack webhook URL for deploy notifications | `string` | n/a | yes |
+| slack\_username | The name of the user that sends the notifications | `string` | `"Deploy Bot"` | no |
+| stage | Stage (e.g. `prod`, `dev`, `staging`) | `string` | n/a | yes |
+
+## Outputs
+
+No output.
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
