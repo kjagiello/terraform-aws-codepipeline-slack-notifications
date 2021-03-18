@@ -59,16 +59,35 @@ resource "aws_codepipeline" "codepipeline" {
 }
 
 resource "aws_s3_bucket" "artifact_bucket" {
+  # tfsec:ignore:AWS002
+  #
   bucket = "notifications-test-artifact-bucket"
   acl    = "private"
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket" "source_bucket" {
+  # tfsec:ignore:AWS002
   bucket = "notifications-test-source-bucket"
   acl    = "private"
 
   versioning {
     enabled = true
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
   }
 }
 
