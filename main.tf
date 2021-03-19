@@ -11,8 +11,8 @@ locals {
 }
 
 resource "aws_sns_topic" "pipeline_updates" {
-  name              = local.subscription_name
-  kms_master_key_id = "alias/aws/sns"
+  # tfsec:ignore:AWS016
+  name = local.subscription_name
 }
 
 resource "aws_sns_topic_subscription" "pipeline_updates" {
