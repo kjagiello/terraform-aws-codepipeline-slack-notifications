@@ -56,15 +56,15 @@ should be good to go.
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12 |
-| archive | ~> 1.3 |
-| aws | ~> 2.70 |
+| archive | >= 1.3 |
+| aws | >= 2.70, < 4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| archive | ~> 1.3 |
-| aws | ~> 2.70 |
+| archive | >= 1.3 |
+| aws | >= 2.70, < 4.0 |
 
 ## Inputs
 
