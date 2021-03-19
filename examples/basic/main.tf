@@ -60,7 +60,6 @@ resource "aws_codepipeline" "codepipeline" {
 
 resource "aws_s3_bucket" "artifact_bucket" {
   # tfsec:ignore:AWS002
-  #
   bucket = "notifications-test-artifact-bucket"
   acl    = "private"
 
