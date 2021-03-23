@@ -80,6 +80,7 @@ should be good to go.
 | slack\_url | Slack webhook URL for deploy notifications | `string` | n/a | yes |
 | slack\_username | The name of the user that sends the notifications | `string` | `"Deploy Bot"` | no |
 | stage | Stage (e.g. `prod`, `dev`, `staging`) | `string` | n/a | yes |
+| tags | Additional tags (e.g. `map('BusinessUnit','XYZ')` | `map(string)` | `{}` | no |
 
 ## Outputs
 

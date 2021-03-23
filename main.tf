@@ -1,9 +1,10 @@
 module "default_label" {
-  source     = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=tags/0.5.0"
+  source     = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=tags/0.6.0"
   namespace  = var.namespace
   stage      = var.stage
   name       = var.name
   attributes = var.attributes
+  tags       = var.tags
 }
 
 locals {
@@ -13,6 +14,7 @@ locals {
 resource "aws_sns_topic" "pipeline_updates" {
   # tfsec:ignore:AWS016
   name = local.subscription_name
+  tags = module.default_label.tags
 }
 
 resource "aws_sns_topic_subscription" "pipeline_updates" {
@@ -32,6 +34,8 @@ resource "aws_codestarnotifications_notification_rule" "pipeline_updates" {
     address = aws_sns_topic.pipeline_updates.arn
     type    = "SNS"
   }
+
+  tags = module.default_label.tags
 }
 
 resource "aws_sns_topic_policy" "pipeline_updates" {
@@ -84,6 +88,8 @@ resource "aws_lambda_function" "pipeline_notification" {
     }
   }
 
+  tags = module.default_label.tags
+
   depends_on = [
     aws_iam_role_policy_attachment.pipeline_notification,
     data.archive_file.notifier_package,
@@ -98,24 +104,51 @@ resource "aws_lambda_permission" "pipeline_notification" {
   source_arn    = aws_sns_topic.pipeline_updates.arn
 }
 
+data "aws_iam_policy_document" "pipeline_notification_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      identifiers = ["lambda.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
 resource "aws_iam_role" "pipeline_notification" {
   name = "${module.default_label.id}-pipeline-notification"
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
+  assume_role_policy = data.aws_iam_policy_document.pipeline_notification_role.json
+
+  tags = module.default_label.tags
 }
-EOF
+
+data "aws_iam_policy_document" "pipeline_notification" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "arn:aws:logs:*:*:*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "codepipeline:GetPipelineExecution"
+    ]
+    resources = var.codepipelines.*.arn
+  }
+
+  statement {
+    actions = [
+      "iam:PassRole"
+    ]
+    resources = [
+      aws_iam_role.pipeline_notification.arn
+    ]
+  }
 }
 
 resource "aws_iam_policy" "pipeline_notification" {
@@ -123,40 +156,7 @@ resource "aws_iam_policy" "pipeline_notification" {
   path        = "/"
   description = "IAM policy for the Slack notification lambda"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": [
-        "arn:aws:logs:*:*:*"
-      ],
-      "Effect": "Allow"
-    },
-    {
-      "Action": [
-        "codepipeline:GetPipelineExecution"
-      ],
-      "Resource": ${jsonencode(var.codepipelines.*.arn)},
-      "Effect": "Allow"
-    },
-    {
-      "Action": [
-        "iam:PassRole"
-      ],
-      "Resource": [
-        "${aws_iam_role.pipeline_notification.arn}"
-      ],
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
+  policy = data.aws_iam_policy_document.pipeline_notification.json
 }
 
 resource "aws_iam_role_policy_attachment" "pipeline_notification" {

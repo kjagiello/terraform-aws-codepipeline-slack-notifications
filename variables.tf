@@ -19,6 +19,12 @@ variable "attributes" {
   default     = []
 }
 
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "Additional tags (e.g. `map('BusinessUnit','XYZ')`"
+}
+
 variable "codepipelines" {
   type        = list(any)
   description = "CodePipeline resources that should trigger Slack notifications"
