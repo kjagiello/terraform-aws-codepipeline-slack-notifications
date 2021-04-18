@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        terraform-version: [ 0.12.30, 0.13.6, 0.14.8 ]
+        terraform-version: [ 0.12.30, 0.13.6, 0.14.10, 0.15.0 ]
     steps:
       - uses: actions/checkout@v2
       - run: terraform fmt -check
@@ -26,10 +26,10 @@ jobs:
   lint-terraform:
     runs-on: ubuntu-latest
     env:
-      TERRAFORM_VERSION: 0.14.8
-      TFLINT_VERSION: 0.25.0
-      TFSEC_VERSION: 0.39.8
-      TERRAFORM_DOCS_VERSION: 0.11.2
+      TERRAFORM_VERSION: 0.15.0
+      TFLINT_VERSION: 0.26.0
+      TFSEC_VERSION: 0.39.21
+      TERRAFORM_DOCS_VERSION: 0.12.1
     steps:
       - name: Install Terraform
         run: |

@@ -55,34 +55,34 @@ should be good to go.
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12 |
-| archive | >= 1.3 |
-| aws | >= 2.70, < 4.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.12 |
+| <a name="requirement_archive"></a> [archive](#requirement\_archive) | >= 1.3 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 2.70, < 4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| archive | >= 1.3 |
-| aws | >= 2.70, < 4.0 |
+| <a name="provider_archive"></a> [archive](#provider\_archive) | >= 1.3 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 2.70, < 4.0 |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| attributes | List of attributes to add to label | `list(any)` | `[]` | no |
-| codepipelines | CodePipeline resources that should trigger Slack notifications | `list(any)` | n/a | yes |
-| event\_type\_ids | The list of event type to trigger a notification on | `list(any)` | <pre>[<br>  "codepipeline-pipeline-pipeline-execution-failed",<br>  "codepipeline-pipeline-pipeline-execution-canceled",<br>  "codepipeline-pipeline-pipeline-execution-started",<br>  "codepipeline-pipeline-pipeline-execution-resumed",<br>  "codepipeline-pipeline-pipeline-execution-succeeded",<br>  "codepipeline-pipeline-pipeline-execution-superseded"<br>]</pre> | no |
-| name | Name (unique identifier for app or service) | `string` | n/a | yes |
-| namespace | Namespace (e.g. `skynet`) | `string` | n/a | yes |
-| slack\_channel | A slack channel to send the deployment notifications to | `string` | n/a | yes |
-| slack\_emoji | The emoji avatar of the user that sends the notifications | `string` | `":rocket:"` | no |
-| slack\_url | Slack webhook URL for deploy notifications | `string` | n/a | yes |
-| slack\_username | The name of the user that sends the notifications | `string` | `"Deploy Bot"` | no |
-| stage | Stage (e.g. `prod`, `dev`, `staging`) | `string` | n/a | yes |
-| tags | Additional tags (e.g. `map('BusinessUnit','XYZ')`) | `map(string)` | `{}` | no |
+| <a name="input_attributes"></a> [attributes](#input\_attributes) | List of attributes to add to label | `list(any)` | `[]` | no |
+| <a name="input_codepipelines"></a> [codepipelines](#input\_codepipelines) | CodePipeline resources that should trigger Slack notifications | `list(any)` | n/a | yes |
+| <a name="input_event_type_ids"></a> [event\_type\_ids](#input\_event\_type\_ids) | The list of event type to trigger a notification on | `list(any)` | <pre>[<br>  "codepipeline-pipeline-pipeline-execution-failed",<br>  "codepipeline-pipeline-pipeline-execution-canceled",<br>  "codepipeline-pipeline-pipeline-execution-started",<br>  "codepipeline-pipeline-pipeline-execution-resumed",<br>  "codepipeline-pipeline-pipeline-execution-succeeded",<br>  "codepipeline-pipeline-pipeline-execution-superseded"<br>]</pre> | no |
+| <a name="input_name"></a> [name](#input\_name) | Name (unique identifier for app or service) | `string` | n/a | yes |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace (e.g. `skynet`) | `string` | n/a | yes |
+| <a name="input_slack_channel"></a> [slack\_channel](#input\_slack\_channel) | A slack channel to send the deployment notifications to | `string` | n/a | yes |
+| <a name="input_slack_emoji"></a> [slack\_emoji](#input\_slack\_emoji) | The emoji avatar of the user that sends the notifications | `string` | `":rocket:"` | no |
+| <a name="input_slack_url"></a> [slack\_url](#input\_slack\_url) | Slack webhook URL for deploy notifications | `string` | n/a | yes |
+| <a name="input_slack_username"></a> [slack\_username](#input\_slack\_username) | The name of the user that sends the notifications | `string` | `"Deploy Bot"` | no |
+| <a name="input_stage"></a> [stage](#input\_stage) | Stage (e.g. `prod`, `dev`, `staging`) | `string` | n/a | yes |
+| <a name="input_tags"></a> [tags](#input\_tags) | Additional tags (e.g. `map('BusinessUnit','XYZ')`) | `map(string)` | `{}` | no |
 
 ## Outputs
 
-No output.
+No outputs.
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
