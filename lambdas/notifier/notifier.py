@@ -49,6 +49,13 @@ def format_slack_attachment(
                 "value": f"{revision_summary}{revision_link}",
             },
         ]
+    else:
+        revision = [
+            {
+                "title": "Code revision",
+                "value": "Unknown",
+            },
+        ]
     return {
         "color": STATE_COLORS[pipeline_state],
         "fallback": (f"`{pipeline_name}` has `{pipeline_state}`"),
