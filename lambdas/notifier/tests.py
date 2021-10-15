@@ -1,6 +1,7 @@
 import json
 import os
 import unittest
+from copy import deepcopy
 from unittest import mock
 
 import boto3
@@ -143,6 +144,31 @@ class TestNotifier(unittest.TestCase):
                 ],
             },
         )
+
+    @mock.patch("urllib.request.urlopen")
+    @mock.patch("notifier.get_codepipeline_client")
+    def test_handles_missing_revision_gracefully(self, codepipeline_mock, urlopen_mock):
+        # Get rid of the revision summary
+        pipeline_execution = deepcopy(PIPELINE_EXECUTION)
+        service_response = pipeline_execution["service_response"]
+        del service_response["pipelineExecution"]["artifactRevisions"][0][
+            "revisionSummary"
+        ]
+
+        codepipeline_mock.return_value = boto3.client("codepipeline")
+        with Stubber(codepipeline_mock.return_value) as stubber:
+            stubber.add_response("get_pipeline_execution", **pipeline_execution)
+            notifier.handler(event=TEST_EVENT, context={})
+
+        urlopen_mock.assert_called_once()
+        request = urlopen_mock.call_args[0][0]
+        payload = json.loads(request.data)
+        revision_field = [
+            field
+            for field in payload["attachments"][0]["fields"]
+            if field["title"] == "Code revision"
+        ][0]
+        self.assertEqual(revision_field["value"], "Unknown")
 
 
 if __name__ == "__main__":
