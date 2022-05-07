@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        terraform-version: [ 0.12.30, 0.13.6, 0.14.10, 0.15.0 ]
+        terraform-version: [ 0.12.30, 0.13.6, 0.14.10, 0.15.0, 1.1.9 ]
     steps:
       - uses: actions/checkout@v2
       - run: terraform fmt -check
@@ -74,7 +74,7 @@ jobs:
           python-version: 3.8
 
       - name: Install dependencies
-        run: pip install --pre flake8==3.9.0 black==20.8b1
+        run: pip install --pre flake8==4.0.1 black==22.3.0
 
       - uses: actions/checkout@v2
       - run: flake8
@@ -99,7 +99,7 @@ jobs:
       # 3.8 lambda. See the link below for reference.
       # https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
       - name: Install dependencies
-        run: pip install boto3==1.16.31 botocore==1.19.31
+        run: pip install boto3==1.20.32 botocore==1.23.32
 
       - uses: actions/checkout@v2
       - run: python -m tests
