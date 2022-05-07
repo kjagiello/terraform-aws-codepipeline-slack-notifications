@@ -57,14 +57,14 @@ should be good to go.
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.12 |
 | <a name="requirement_archive"></a> [archive](#requirement\_archive) | >= 1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 2.70, < 4.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 2.70, < 5.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_archive"></a> [archive](#provider\_archive) | >= 1.3 |
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 2.70, < 4.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 2.70, < 5.0 |
 
 ## Inputs
 
