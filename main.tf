@@ -153,6 +153,8 @@ resource "aws_iam_policy" "pipeline_notification" {
   description = "IAM policy for the Slack notification lambda"
 
   policy = data.aws_iam_policy_document.pipeline_notification.json
+
+  tags = module.default_label.tags
 }
 
 resource "aws_iam_role_policy_attachment" "pipeline_notification" {
