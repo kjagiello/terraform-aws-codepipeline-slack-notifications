@@ -154,7 +154,7 @@ resource "aws_iam_policy" "pipeline_notification" {
 
   policy = data.aws_iam_policy_document.pipeline_notification.json
 
-  tags = module.default_label.tags
+  tags = module.this.tags
 }
 
 resource "aws_iam_role_policy_attachment" "pipeline_notification" {
