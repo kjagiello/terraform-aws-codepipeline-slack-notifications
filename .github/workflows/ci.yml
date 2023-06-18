@@ -29,7 +29,7 @@ jobs:
       TERRAFORM_VERSION: 0.15.0
       TFLINT_VERSION: 0.26.0
       TFSEC_VERSION: 0.39.21
-      TERRAFORM_DOCS_VERSION: 0.12.1
+      TERRAFORM_DOCS_VERSION: 0.16.0
     steps:
       - name: Install Terraform
         run: |
