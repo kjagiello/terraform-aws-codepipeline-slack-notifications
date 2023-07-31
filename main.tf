@@ -1,20 +1,16 @@
-module "default_label" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.22.0"
-  namespace  = var.namespace
-  stage      = var.stage
-  name       = var.name
-  attributes = var.attributes
-  tags       = var.tags
-}
+module "subscription_label" {
+  source  = "cloudposse/label/null"
+  version = "0.25.0"
 
-locals {
-  subscription_name = "${module.default_label.id}-pipeline-updates"
+  attributes = ["pipeline", "updates"]
+
+  context = module.this.context
 }
 
 resource "aws_sns_topic" "pipeline_updates" {
   # tfsec:ignore:AWS016
-  name = local.subscription_name
-  tags = module.default_label.tags
+  name = module.subscription_label.id
+  tags = module.this.tags
 }
 
 resource "aws_sns_topic_subscription" "pipeline_updates" {
@@ -24,18 +20,18 @@ resource "aws_sns_topic_subscription" "pipeline_updates" {
 }
 
 resource "aws_codestarnotifications_notification_rule" "pipeline_updates" {
-  count          = length(var.codepipelines)
+  for_each       = { for pipeline in var.codepipelines : pipeline.name => pipeline.arn }
   detail_type    = "FULL"
   event_type_ids = var.event_type_ids
-  name           = "slackNotification${var.codepipelines[count.index].name}"
-  resource       = var.codepipelines[count.index].arn
+  name           = join("-", [each.key, module.this.name])
+  resource       = each.value
 
   target {
     address = aws_sns_topic.pipeline_updates.arn
     type    = "SNS"
   }
 
-  tags = module.default_label.tags
+  tags = module.this.tags
 }
 
 resource "aws_sns_topic_policy" "pipeline_updates" {
@@ -71,7 +67,7 @@ data "archive_file" "notifier_package" {
 
 resource "aws_lambda_function" "pipeline_notification" {
   filename         = "${path.module}/lambdas/notifier.zip"
-  function_name    = module.default_label.id
+  function_name    = module.this.id
   role             = aws_iam_role.pipeline_notification.arn
   runtime          = "python3.8"
   source_code_hash = data.archive_file.notifier_package.output_base64sha256
@@ -88,7 +84,7 @@ resource "aws_lambda_function" "pipeline_notification" {
     }
   }
 
-  tags = module.default_label.tags
+  tags = module.this.tags
 
   depends_on = [
     aws_iam_role_policy_attachment.pipeline_notification,
@@ -115,11 +111,11 @@ data "aws_iam_policy_document" "pipeline_notification_role" {
 }
 
 resource "aws_iam_role" "pipeline_notification" {
-  name = "${module.default_label.id}-pipeline-notification"
+  name = "${module.this.id}-pipeline-notification"
 
   assume_role_policy = data.aws_iam_policy_document.pipeline_notification_role.json
 
-  tags = module.default_label.tags
+  tags = module.this.tags
 }
 
 data "aws_iam_policy_document" "pipeline_notification" {
@@ -152,13 +148,13 @@ data "aws_iam_policy_document" "pipeline_notification" {
 }
 
 resource "aws_iam_policy" "pipeline_notification" {
-  name        = "${module.default_label.id}-pipeline-notification"
+  name        = "${module.this.id}-pipeline-notification"
   path        = "/"
   description = "IAM policy for the Slack notification lambda"
 
   policy = data.aws_iam_policy_document.pipeline_notification.json
 
-  tags = module.default_label.tags
+  tags = module.this.tags
 }
 
 resource "aws_iam_role_policy_attachment" "pipeline_notification" {

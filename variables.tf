@@ -1,30 +1,3 @@
-variable "name" {
-  type        = string
-  description = "Name (unique identifier for app or service)"
-}
-
-variable "namespace" {
-  type        = string
-  description = "Namespace (e.g. `skynet`)"
-}
-
-variable "stage" {
-  type        = string
-  description = "Stage (e.g. `prod`, `dev`, `staging`)"
-}
-
-variable "attributes" {
-  type        = list(any)
-  description = "List of attributes to add to label"
-  default     = []
-}
-
-variable "tags" {
-  type        = map(string)
-  default     = {}
-  description = "Additional tags (e.g. `map('BusinessUnit','XYZ')`)"
-}
-
 variable "codepipelines" {
   type        = list(any)
   description = "CodePipeline resources that should trigger Slack notifications"
