@@ -15,7 +15,7 @@ resource "aws_codepipeline" "example" {
 
 module "codepipeline_notifications" {
   source  = "kjagiello/codepipeline-slack-notifications/aws"
-  version = "1.0.0"
+  version = "2.0.0"
 
   name          = "codepipeline-notifications"
   namespace     = "kjagiello"
