@@ -37,7 +37,7 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         S3Bucket    = aws_s3_bucket.source_bucket.bucket
-        S3ObjectKey = aws_s3_bucket_object.source_object.key
+        S3ObjectKey = aws_s3_object.source_object.key
       }
     }
   }
@@ -90,7 +90,7 @@ resource "aws_s3_bucket" "source_bucket" {
   }
 }
 
-resource "aws_s3_bucket_object" "source_object" {
+resource "aws_s3_object" "source_object" {
   bucket  = aws_s3_bucket.source_bucket.bucket
   key     = "test"
   content = "test"
