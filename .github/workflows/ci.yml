@@ -21,7 +21,7 @@ jobs:
       max: ${{ steps.versions.outputs.maxVersion }}
 
   pre-commit:
-    needs: [terraform-versions]
+    needs: terraform-versions
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -36,6 +36,12 @@ jobs:
         uses: clowdhaus/terraform-composite-actions/pre-commit@main
         with:
           terraform-version: ${{ matrix.terraform-version }}
+
+  pre-commit-success:
+    needs: pre-commit
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo OK
 
   lint-python:
     runs-on: ubuntu-latest
