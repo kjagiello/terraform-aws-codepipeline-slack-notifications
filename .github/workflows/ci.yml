@@ -7,63 +7,36 @@ on:
   pull_request:
 
 jobs:
-  validate-terraform:
+  terraform-versions:
+    name: Extract Terraform min and max versions
     runs-on: ubuntu-latest
-    container:
-      image: hashicorp/terraform:${{ matrix.terraform-version }}
-      env:
-        AWS_DEFAULT_REGION: eu-west-1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Terraform min/max versions
+        id: versions
+        uses: clowdhaus/terraform-min-max@v1.2.7
+    outputs:
+      min: ${{ steps.versions.outputs.minVersion }}
+      max: ${{ steps.versions.outputs.maxVersion }}
+
+  pre-commit:
+    needs: [terraform-versions]
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        terraform-version: [ 0.13.6, 0.14.10, 0.15.0, 1.1.9, 1.5.0 ]
+        terraform-version:
+          - ${{ needs.terraform-versions.outputs.min }}
+          - ${{ needs.terraform-versions.outputs.max }}
     steps:
-      - uses: actions/checkout@v2
-      - run: terraform fmt -check
-      - run: terraform init
-      - run: terraform validate
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  lint-terraform:
-    runs-on: ubuntu-latest
-    env:
-      TERRAFORM_VERSION: 0.15.0
-      TFLINT_VERSION: 0.26.0
-      TFSEC_VERSION: 0.39.21
-      TERRAFORM_DOCS_VERSION: 0.16.0
-    steps:
-      - name: Install Terraform
-        run: |
-          wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-          unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-          sudo mv terraform /usr/local/bin/
-          rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-
-      - name: Install tflint
-        run: |
-          wget https://github.com/wata727/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_amd64.zip
-          unzip tflint_linux_amd64.zip
-          sudo mv tflint /usr/local/bin/
-          rm tflint_linux_amd64.zip
-
-      - name: Install tfsec
-        run: |
-          wget https://github.com/tfsec/tfsec/releases/download/v${TFSEC_VERSION}/tfsec-linux-amd64
-          chmod +x tfsec-linux-amd64
-          sudo mv tfsec-linux-amd64 /usr/local/bin/tfsec
-
-      - name: Install terraform-docs
-        run: |
-          wget https://github.com/terraform-docs/terraform-docs/releases/download/v${TERRAFORM_DOCS_VERSION}/terraform-docs-v${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz
-          tar -xzf terraform-docs-v${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz
-          chmod +x terraform-docs
-          sudo mv terraform-docs /usr/local/bin/
-          rm terraform-docs-v${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz
-
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - uses: pre-commit/action@v2.0.0
-        env:
-          SKIP: terraform_fmt,terraform_validate
+      - name: Run pre-commit
+        uses: clowdhaus/terraform-composite-actions/pre-commit@main
+        with:
+          terraform-version: ${{ matrix.terraform-version }}
 
   lint-python:
     runs-on: ubuntu-latest
@@ -76,7 +49,7 @@ jobs:
       - name: Install dependencies
         run: pip install --pre flake8==4.0.1 black==22.3.0
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: flake8
       - run: black --check .
 
@@ -101,6 +74,6 @@ jobs:
       - name: Install dependencies
         run: pip install boto3==1.20.32 botocore==1.23.32
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - run: python -m tests
         working-directory: lambdas/${{ matrix.lambda }}
