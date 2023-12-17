@@ -160,7 +160,9 @@ TEST_MATRIX = [
             "attachments": [
                 {
                     "color": "#f5d142",
-                    "fallback": "Deployment of kjagiello-qa-homepage is awaiting approval.",
+                    "fallback": (
+                        "Deployment of kjagiello-qa-homepage is awaiting approval.",
+                    ),
                     "fields": [
                         {"title": "Pipeline", "value": "kjagiello-qa-homepage"},
                         {
@@ -197,7 +199,9 @@ TEST_MATRIX = [
             "attachments": [
                 {
                     "color": "#50ba32",
-                    "fallback": "Deployment of kjagiello-qa-homepage has been approved.",
+                    "fallback": (
+                        "Deployment of kjagiello-qa-homepage has been approved."
+                    ),
                     "fields": [
                         {"title": "Pipeline", "value": "kjagiello-qa-homepage"},
                         {
@@ -234,7 +238,9 @@ TEST_MATRIX = [
             "attachments": [
                 {
                     "color": "#f02b1d",
-                    "fallback": "Deployment of kjagiello-qa-homepage has been rejected.",
+                    "fallback": (
+                        "Deployment of kjagiello-qa-homepage has been rejected."
+                    ),
                     "fields": [
                         {"title": "Pipeline", "value": "kjagiello-qa-homepage"},
                         {
