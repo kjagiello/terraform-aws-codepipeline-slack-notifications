@@ -60,7 +60,8 @@ resource "aws_codepipeline" "codepipeline" {
 
 resource "aws_s3_bucket" "artifact_bucket" {
   # tfsec:ignore:AWS002
-  bucket = "notifications-test-artifact-bucket"
+  bucket        = "notifications-test-artifact-bucket"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_ownership_controls" "artifact_bucket" {
@@ -89,7 +90,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "artifact_bucket" 
 
 resource "aws_s3_bucket" "source_bucket" {
   # tfsec:ignore:AWS002
-  bucket = "notifications-test-source-bucket"
+  bucket        = "notifications-test-source-bucket"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_ownership_controls" "source_bucket" {
