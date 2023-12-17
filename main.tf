@@ -20,13 +20,16 @@ resource "aws_sns_topic_subscription" "pipeline_updates" {
 }
 
 resource "aws_cloudwatch_event_rule" "pipeline_updates" {
-  name = module.subscription_label.id
+  name = "${module.subscription_label.id}-pipeline"
   tags = module.this.tags
   event_pattern = jsonencode({
-    source      = ["aws.codepipeline"]
-    detail-type = ["CodePipeline Pipeline Execution State Change"],
+    source = ["aws.codepipeline"]
+    detail-type = [
+      "CodePipeline Pipeline Execution State Change",
+    ]
     detail = {
       pipeline = var.codepipelines.*.name
+      state    = [for id in var.pipeline_event_type_ids : upper(id)]
     }
   })
 }
@@ -34,7 +37,30 @@ resource "aws_cloudwatch_event_rule" "pipeline_updates" {
 resource "aws_cloudwatch_event_target" "pipeline_updates" {
   rule      = aws_cloudwatch_event_rule.pipeline_updates.name
   arn       = aws_sns_topic.pipeline_updates.arn
-  target_id = module.subscription_label.id
+  target_id = "${module.subscription_label.id}-pipeline"
+}
+
+resource "aws_cloudwatch_event_rule" "approval_updates" {
+  name = "${module.subscription_label.id}-approval"
+  tags = module.this.tags
+  event_pattern = jsonencode({
+    source = ["aws.codepipeline"]
+    detail-type = [
+      "CodePipeline Action Execution State Change",
+    ]
+    detail = {
+      pipeline = var.codepipelines.*.name
+      state    = [for id in var.approval_event_type_ids : upper(id)]
+      type = {
+        category = ["Approval"]
+      }
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "approval_updates" {
+  rule = aws_cloudwatch_event_rule.approval_updates.name
+  arn  = aws_sns_topic.pipeline_updates.arn
 }
 
 resource "aws_sns_topic_policy" "pipeline_updates" {

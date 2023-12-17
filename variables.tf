@@ -25,13 +25,13 @@ variable "slack_emoji" {
   default     = ":rocket:"
 }
 
-variable "event_type_ids" {
+variable "pipeline_event_type_ids" {
   type        = list(string)
-  description = "The list of event type to trigger a notification on"
+  description = "The list of pipeline events to trigger a notification on"
   default = [
+    "started",
     "failed",
     "canceled",
-    "started",
     "resumed",
     "succeeded",
     "superseded"
@@ -39,10 +39,10 @@ variable "event_type_ids" {
 
   validation {
     condition = length(
-      setsubtract(var.event_type_ids, [
+      setsubtract(var.pipeline_event_type_ids, [
+        "started",
         "failed",
         "canceled",
-        "started",
         "resumed",
         "succeeded",
         "superseded"
@@ -50,7 +50,31 @@ variable "event_type_ids" {
     ) == 0
     error_message = <<-EOF
     Invalid event type IDs found.
-    Allowed type IDs: failed, canceled, started, resumed, succeeded, superseded.
+    Allowed type IDs: started, failed, canceled, resumed, succeeded, superseded.
+    EOF
+  }
+}
+
+variable "approval_event_type_ids" {
+  type        = list(string)
+  description = "The list of pipeline events to trigger a notification on"
+  default = [
+    "started",
+    "succeeded",
+    "failed",
+  ]
+
+  validation {
+    condition = length(
+      setsubtract(var.approval_event_type_ids, [
+        "started",
+        "succeeded",
+        "failed",
+      ])
+    ) == 0
+    error_message = <<-EOF
+    Invalid event type IDs found.
+    Allowed type IDs: started, succeeded, failed.
     EOF
   }
 }
