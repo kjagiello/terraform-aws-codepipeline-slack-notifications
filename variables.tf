@@ -45,7 +45,10 @@ variable "event_type_ids" {
         "started",
         "resumed",
         "succeeded",
-        "superseded"
+        "superseded",
+        "stopping",
+        "stopped",
+        "abandoned"
       ])
     ) == 0
     error_message = <<-EOF

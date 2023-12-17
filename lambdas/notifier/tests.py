@@ -67,7 +67,7 @@ TEST_EVENT = {
 PIPELINE_EXECUTION = {
     "service_response": {
         "pipelineExecution": {
-            "pipelineName": "gina-qa-storefront",
+            "pipelineName": "kjagiello-test-pipeline",
             "pipelineVersion": 20,
             "pipelineExecutionId": "7911f31b-9991-42c2-90db-a5c20ad62b82",
             "status": "Succeeded",

@@ -11,12 +11,19 @@ logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
 STATE_COLORS = {
-    "STARTED": "#1a9edb",
-    "SUCCEEDED": "#50ba32",
-    "RESUMED": "#1a9edb",
-    "FAILED": "#f02b1d",
-    "CANCELED": "#919191",
-    "SUPERSEDED": "#919191",
+    "Deployment": {
+        "STARTED": "#1a9edb",
+        "SUCCEEDED": "#50ba32",
+        "RESUMED": "#1a9edb",
+        "FAILED": "#f02b1d",
+        "CANCELED": "#919191",
+        "SUPERSEDED": "#919191",
+    },
+    "Approval": {
+        "STARTED": "#f5d142",
+        "SUCCEEDED": "#50ba32",
+        "FAILED": "#f02b1d",
+    },
 }
 
 
@@ -31,6 +38,7 @@ def format_slack_attachment(
     execution_id: str,
     environment: str,
     region: str,
+    action: str,
     revision_summary: t.Optional[str],
     revision_url: t.Optional[str],
 ) -> dict:
@@ -57,7 +65,7 @@ def format_slack_attachment(
             },
         ]
     return {
-        "color": STATE_COLORS[pipeline_state],
+        "color": STATE_COLORS[action][pipeline_state],
         "fallback": (f"`{pipeline_name}` has `{pipeline_state}`"),
         "fields": [
             {"title": "Pipeline", "value": pipeline_name},
@@ -70,6 +78,13 @@ def format_slack_attachment(
 
 
 def format_slack_text(*, pipeline_name: str, pipeline_state: str, action: str):
+    if action == "Approval":
+        if pipeline_state == "STARTED":
+            return f"*{pipeline_name}* is awaiting approval."
+        elif pipeline_state == "FAILED":
+            return f"*{pipeline_name}* has rejected."
+        elif pipeline_state == "SUCCEEDED":
+            return f"*{pipeline_name}* has been approved."
     return f"*{action}* of *{pipeline_name}* has {pipeline_state.lower()}."
 
 
@@ -90,18 +105,20 @@ def build_slack_message_from_event(event):
     revision = pipeline_execution["artifactRevisions"][0]
     revision_url = revision.get("revisionUrl")
     revision_summary = revision.get("revisionSummary")
+    action = pipeline_action or "Deployment"
 
     # Build a message with an attachment with details
     text = format_slack_text(
         pipeline_name=pipeline_name,
         pipeline_state=pipeline_state,
-        action=pipeline_action or "Deployment",
+        action=action,
     )
     attachment = format_slack_attachment(
         pipeline_name=pipeline_name,
         pipeline_state=pipeline_state,
         execution_id=execution_id,
         region=region,
+        action=action,
         revision_summary=revision_summary,
         revision_url=revision_url,
         environment=os.environ["ENVIRONMENT"],
