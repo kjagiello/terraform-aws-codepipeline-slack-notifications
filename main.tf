@@ -28,8 +28,8 @@ resource "aws_cloudwatch_event_rule" "pipeline_updates" {
       "CodePipeline Pipeline Execution State Change",
     ]
     detail = {
-      state    = [for id in var.event_type_ids : upper(id)]
       pipeline = var.codepipelines.*.name
+      state    = [for id in var.pipeline_event_type_ids : upper(id)]
     }
   })
 }
@@ -50,6 +50,7 @@ resource "aws_cloudwatch_event_rule" "approval_updates" {
     ]
     detail = {
       pipeline = var.codepipelines.*.name
+      state    = [for id in var.approval_event_type_ids : upper(id)]
       type = {
         category = ["Approval"]
       }
