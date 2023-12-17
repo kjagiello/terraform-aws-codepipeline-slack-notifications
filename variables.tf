@@ -49,8 +49,8 @@ variable "event_type_ids" {
       ])
     ) == 0
     error_message = <<-EOF
-    Variable contains invalid type IDs.
-    (Allowed types IDs: failed, canceled, started, resumed, succeeded, superseded)
+    Invalid event type IDs found.
+    Allowed type IDs: failed, canceled, started, resumed, succeeded, superseded.
     EOF
   }
 }
