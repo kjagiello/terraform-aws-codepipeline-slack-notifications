@@ -19,19 +19,22 @@ resource "aws_sns_topic_subscription" "pipeline_updates" {
   endpoint  = aws_lambda_function.pipeline_notification.arn
 }
 
-resource "aws_codestarnotifications_notification_rule" "pipeline_updates" {
-  for_each       = { for pipeline in var.codepipelines : pipeline.name => pipeline.arn }
-  detail_type    = "FULL"
-  event_type_ids = var.event_type_ids
-  name           = join("-", [each.key, module.this.name])
-  resource       = each.value
-
-  target {
-    address = aws_sns_topic.pipeline_updates.arn
-    type    = "SNS"
-  }
-
+resource "aws_cloudwatch_event_rule" "pipeline_updates" {
+  name = module.subscription_label.id
   tags = module.this.tags
+  event_pattern = jsonencode({
+    source      = ["aws.codepipeline"]
+    detail-type = ["CodePipeline Pipeline Execution State Change"],
+    detail = {
+      pipeline = var.codepipelines.*.name
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "pipeline_updates" {
+  rule      = aws_cloudwatch_event_rule.pipeline_updates.name
+  arn       = aws_sns_topic.pipeline_updates.arn
+  target_id = module.subscription_label.id
 }
 
 resource "aws_sns_topic_policy" "pipeline_updates" {
@@ -41,21 +44,15 @@ resource "aws_sns_topic_policy" "pipeline_updates" {
 
 data "aws_iam_policy_document" "pipeline_updates_policy" {
   statement {
-    sid    = "codestar-notification"
-    effect = "Allow"
-    resources = [
-      aws_sns_topic.pipeline_updates.arn
-    ]
+    sid       = "sns-publish"
+    effect    = "Allow"
+    actions   = ["SNS:Publish"]
+    resources = [aws_sns_topic.pipeline_updates.arn]
 
     principals {
-      identifiers = [
-        "codestar-notifications.amazonaws.com"
-      ]
-      type = "Service"
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
     }
-    actions = [
-      "SNS:Publish"
-    ]
   }
 }
 

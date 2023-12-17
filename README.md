@@ -28,26 +28,6 @@ module "codepipeline_notifications" {
 }
 ```
 
-Beware that during the initial apply, it might fail with following error:
-
-> Error: error creating codestar notification rule: ConfigurationException: AWS
-> CodeStar Notifications could not create the AWS CloudWatch Events managed
-> rule in your AWS account. If this is your first time creating a notification
-> rule, the service-linked role for AWS CodeStar Notifications might not yet
-> exist. Creation of this role might take up to 15 minutes. Until it exists,
-> notification rule creation will fail. Wait 15 minutes, and then try again. If
-> this is is not the first time you are creating a notification rule, there
-> might be a problem with a network connection, or one or more AWS services
-> might be experiencing issues. Verify your network connection and check to see
-> if there are any issues with AWS services in your AWS Region before trying
-> again.
-
-This is due to this module using [AWS CodeStar](https://aws.amazon.com/codestar/)
-for subscribing to the CodePipeline state changes. The first use of a CodeStar
-resource automatically creates the required service-linked role, which
-typically is nearly instantaneous. Just reapply your Terraform plan and you
-should be good to go.
-
 # Module documentation
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
@@ -58,15 +38,6 @@ should be good to go.
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5 |
 | <a name="requirement_archive"></a> [archive](#requirement\_archive) | >= 1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0 |
-
-## Resources
-
-| Name | Type |
-|------|------|
-| [archive_file.notifier_package](https://registry.terraform.io/providers/hashicorp/archive/latest/docs/data-sources/file) | data source |
-| [aws_iam_policy_document.pipeline_notification](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.pipeline_notification_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.pipeline_updates_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 
@@ -79,7 +50,7 @@ should be good to go.
 | <a name="input_delimiter"></a> [delimiter](#input\_delimiter) | Delimiter to be used between `namespace`, `environment`, `stage`, `name` and `attributes`.<br>Defaults to `-` (hyphen). Set to `""` to use no delimiter at all. | `string` | `null` | no |
 | <a name="input_enabled"></a> [enabled](#input\_enabled) | Set to false to prevent the module from creating any resources | `bool` | `null` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment, e.g. 'uw2', 'us-west-2', OR 'prod', 'staging', 'dev', 'UAT' | `string` | `null` | no |
-| <a name="input_event_type_ids"></a> [event\_type\_ids](#input\_event\_type\_ids) | The list of event type to trigger a notification on | `list(any)` | <pre>[<br>  "codepipeline-pipeline-pipeline-execution-failed",<br>  "codepipeline-pipeline-pipeline-execution-canceled",<br>  "codepipeline-pipeline-pipeline-execution-started",<br>  "codepipeline-pipeline-pipeline-execution-resumed",<br>  "codepipeline-pipeline-pipeline-execution-succeeded",<br>  "codepipeline-pipeline-pipeline-execution-superseded"<br>]</pre> | no |
+| <a name="input_event_type_ids"></a> [event\_type\_ids](#input\_event\_type\_ids) | The list of event type to trigger a notification on | `list(string)` | <pre>[<br>  "failed",<br>  "canceled",<br>  "started",<br>  "resumed",<br>  "succeeded",<br>  "superseded"<br>]</pre> | no |
 | <a name="input_id_length_limit"></a> [id\_length\_limit](#input\_id\_length\_limit) | Limit `id` to this many characters (minimum 6).<br>Set to `0` for unlimited length.<br>Set to `null` for default, which is `0`.<br>Does not affect `id_full`. | `number` | `null` | no |
 | <a name="input_label_key_case"></a> [label\_key\_case](#input\_label\_key\_case) | The letter case of label keys (`tag` names) (i.e. `name`, `namespace`, `environment`, `stage`, `attributes`) to use in `tags`.<br>Possible values: `lower`, `title`, `upper`.<br>Default value: `title`. | `string` | `null` | no |
 | <a name="input_label_order"></a> [label\_order](#input\_label\_order) | The naming order of the id output and Name tag.<br>Defaults to ["namespace", "environment", "stage", "name", "attributes"].<br>You can omit any of the 5 elements, but at least one must be present. | `list(string)` | `null` | no |
