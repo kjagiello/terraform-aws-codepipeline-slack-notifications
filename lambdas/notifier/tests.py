@@ -161,7 +161,7 @@ TEST_MATRIX = [
                 {
                     "color": "#f5d142",
                     "fallback": (
-                        "Deployment of kjagiello-qa-homepage is awaiting approval.",
+                        "Deployment of kjagiello-qa-homepage is awaiting approval."
                     ),
                     "fields": [
                         {"title": "Pipeline", "value": "kjagiello-qa-homepage"},
