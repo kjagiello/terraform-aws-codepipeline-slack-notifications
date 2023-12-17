@@ -17,7 +17,7 @@ ENVIRONMENT = {
     "ENVIRONMENT": "qa",
 }
 
-TEST_MESSAGE = {
+TEST_PIPELINE_UPDATE = {
     "version": "0",
     "id": "81ff0678-5b31-cfc8-0ac7-df8664cd764a",
     "detail-type": "CodePipeline Pipeline Execution State Change",
@@ -34,35 +34,60 @@ TEST_MESSAGE = {
     },
 }
 
-TEST_EVENT = {
-    "Records": [
-        {
-            "EventSource": "aws:sns",
-            "EventVersion": "1.0",
-            "EventSubscriptionArn": (
-                "arn:aws:sns:eu-west-1:203144576027"
-                ":kjagiello-qa-codepipeline-notifications-test-pipeline-updates"
-                ":6f7fa819-b7ae-499c-ad67-9aa4fc7a732d"
-            ),
-            "Sns": {
-                "Type": "Notification",
-                "MessageId": "a32e2bde-ed90-5cbf-87ba-7d5e77e56761",
-                "TopicArn": (
+
+def pipeline_approval(state):
+    return {
+        "version": "0",
+        "id": "81ff0678-5b31-cfc8-0ac7-df8664cd764a",
+        "detail-type": "CodePipeline Action Execution State Change",
+        "source": "aws.codepipeline",
+        "account": "203144576027",
+        "time": "2019-12-27T23:47:58Z",
+        "region": "eu-west-1",
+        "resources": [
+            "arn:aws:codepipeline:eu-west-1:203144576027:kjagiello-qa-homepage"
+        ],
+        "detail": {
+            "pipeline": "kjagiello-qa-homepage",
+            "execution-id": "0aeb1e48-4de1-4d3c-8815-4a8a701b1fcc",
+            "state": state,
+            "version": 20.0,
+            "action": "Approval",
+        },
+    }
+
+
+def wrap_event(event):
+    return {
+        "Records": [
+            {
+                "EventSource": "aws:sns",
+                "EventVersion": "1.0",
+                "EventSubscriptionArn": (
                     "arn:aws:sns:eu-west-1:203144576027"
                     ":kjagiello-qa-codepipeline-notifications-test-pipeline-updates"
+                    ":6f7fa819-b7ae-499c-ad67-9aa4fc7a732d"
                 ),
-                "Subject": None,
-                "Message": json.dumps(TEST_MESSAGE),
-                "Timestamp": "2019-12-27T23:48:05.126Z",
-                "SignatureVersion": "1",
-                "Signature": "signature",
-                "SigningCertUrl": "https://sns.eu-west-1.amazonaws.com/...",
-                "UnsubscribeUrl": "https://sns.eu-west-1.amazonaws.com/...",
-                "MessageAttributes": {},
-            },
-        }
-    ]
-}
+                "Sns": {
+                    "Type": "Notification",
+                    "MessageId": "a32e2bde-ed90-5cbf-87ba-7d5e77e56761",
+                    "TopicArn": (
+                        "arn:aws:sns:eu-west-1:203144576027"
+                        ":kjagiello-qa-codepipeline-notifications-test-pipeline-updates"
+                    ),
+                    "Subject": None,
+                    "Message": json.dumps(event),
+                    "Timestamp": "2019-12-27T23:48:05.126Z",
+                    "SignatureVersion": "1",
+                    "Signature": "signature",
+                    "SigningCertUrl": "https://sns.eu-west-1.amazonaws.com/...",
+                    "UnsubscribeUrl": "https://sns.eu-west-1.amazonaws.com/...",
+                    "MessageAttributes": {},
+                },
+            }
+        ]
+    }
+
 
 PIPELINE_EXECUTION = {
     "service_response": {
@@ -87,63 +112,189 @@ PIPELINE_EXECUTION = {
     },
 }
 
+TEST_MATRIX = [
+    (
+        TEST_PIPELINE_UPDATE,
+        {
+            "channel": "#notifications",
+            "username": "Mr. Robot",
+            "icon_emoji": ":rocket:",
+            "text": "*Deployment* of *kjagiello-qa-homepage* has started.",
+            "attachments": [
+                {
+                    "color": "#1a9edb",
+                    "fallback": "Deployment of kjagiello-qa-homepage has started.",
+                    "fields": [
+                        {"title": "Pipeline", "value": "kjagiello-qa-homepage"},
+                        {
+                            "title": "Execution ID",
+                            "value": (
+                                "<https://eu-west-1.console.aws.amazon.com/"
+                                "codesuite/codepipeline/pipelines/kjagiello-"
+                                "qa-homepage/executions/0aeb1e48-4de1-4d3c-"
+                                "8815-4a8a701b1fcc/timeline?region=eu-west-1|"
+                                "0aeb1e48-4de1-4d3c-8815-4a8a701b1fcc>"
+                            ),
+                        },
+                        {"title": "Environment", "value": "QA", "short": True},
+                        {"title": "Region", "value": "eu-west-1", "short": True},
+                        {
+                            "title": "Code revision",
+                            "value": (
+                                "commit message\n\n"
+                                "<http://foo.bar|View the changeset>"
+                            ),
+                        },
+                    ],
+                }
+            ],
+        },
+    ),
+    (
+        pipeline_approval("STARTED"),
+        {
+            "channel": "#notifications",
+            "username": "Mr. Robot",
+            "icon_emoji": ":rocket:",
+            "text": "*Deployment* of *kjagiello-qa-homepage* is awaiting approval.",
+            "attachments": [
+                {
+                    "color": "#f5d142",
+                    "fallback": "Deployment of kjagiello-qa-homepage is awaiting approval.",
+                    "fields": [
+                        {"title": "Pipeline", "value": "kjagiello-qa-homepage"},
+                        {
+                            "title": "Execution ID",
+                            "value": (
+                                "<https://eu-west-1.console.aws.amazon.com/"
+                                "codesuite/codepipeline/pipelines/kjagiello-"
+                                "qa-homepage/executions/0aeb1e48-4de1-4d3c-"
+                                "8815-4a8a701b1fcc/timeline?region=eu-west-1|"
+                                "0aeb1e48-4de1-4d3c-8815-4a8a701b1fcc>"
+                            ),
+                        },
+                        {"title": "Environment", "value": "QA", "short": True},
+                        {"title": "Region", "value": "eu-west-1", "short": True},
+                        {
+                            "title": "Code revision",
+                            "value": (
+                                "commit message\n\n"
+                                "<http://foo.bar|View the changeset>"
+                            ),
+                        },
+                    ],
+                }
+            ],
+        },
+    ),
+    (
+        pipeline_approval("SUCCEEDED"),
+        {
+            "channel": "#notifications",
+            "username": "Mr. Robot",
+            "icon_emoji": ":rocket:",
+            "text": "*Deployment* of *kjagiello-qa-homepage* has been approved.",
+            "attachments": [
+                {
+                    "color": "#50ba32",
+                    "fallback": "Deployment of kjagiello-qa-homepage has been approved.",
+                    "fields": [
+                        {"title": "Pipeline", "value": "kjagiello-qa-homepage"},
+                        {
+                            "title": "Execution ID",
+                            "value": (
+                                "<https://eu-west-1.console.aws.amazon.com/"
+                                "codesuite/codepipeline/pipelines/kjagiello-"
+                                "qa-homepage/executions/0aeb1e48-4de1-4d3c-"
+                                "8815-4a8a701b1fcc/timeline?region=eu-west-1|"
+                                "0aeb1e48-4de1-4d3c-8815-4a8a701b1fcc>"
+                            ),
+                        },
+                        {"title": "Environment", "value": "QA", "short": True},
+                        {"title": "Region", "value": "eu-west-1", "short": True},
+                        {
+                            "title": "Code revision",
+                            "value": (
+                                "commit message\n\n"
+                                "<http://foo.bar|View the changeset>"
+                            ),
+                        },
+                    ],
+                }
+            ],
+        },
+    ),
+    (
+        pipeline_approval("FAILED"),
+        {
+            "channel": "#notifications",
+            "username": "Mr. Robot",
+            "icon_emoji": ":rocket:",
+            "text": "*Deployment* of *kjagiello-qa-homepage* has been rejected.",
+            "attachments": [
+                {
+                    "color": "#f02b1d",
+                    "fallback": "Deployment of kjagiello-qa-homepage has been rejected.",
+                    "fields": [
+                        {"title": "Pipeline", "value": "kjagiello-qa-homepage"},
+                        {
+                            "title": "Execution ID",
+                            "value": (
+                                "<https://eu-west-1.console.aws.amazon.com/"
+                                "codesuite/codepipeline/pipelines/kjagiello-"
+                                "qa-homepage/executions/0aeb1e48-4de1-4d3c-"
+                                "8815-4a8a701b1fcc/timeline?region=eu-west-1|"
+                                "0aeb1e48-4de1-4d3c-8815-4a8a701b1fcc>"
+                            ),
+                        },
+                        {"title": "Environment", "value": "QA", "short": True},
+                        {"title": "Region", "value": "eu-west-1", "short": True},
+                        {
+                            "title": "Code revision",
+                            "value": (
+                                "commit message\n\n"
+                                "<http://foo.bar|View the changeset>"
+                            ),
+                        },
+                    ],
+                }
+            ],
+        },
+    ),
+]
+
 
 @mock.patch.dict(os.environ, ENVIRONMENT)
 class TestNotifier(unittest.TestCase):
-    @mock.patch("urllib.request.urlopen")
-    @mock.patch("notifier.get_codepipeline_client")
-    def test_send_notification_for_event(self, codepipeline_mock, urlopen_mock):
-        cm = mock.MagicMock()
-        cm.getcode.return_value = 200
-        cm.read.return_value = b"ok"
-        urlopen_mock.return_value = cm
+    def test_send_notification_for_event(self):
+        self.maxDiff = None
+        for event, slack_message in TEST_MATRIX:
+            with self.subTest(event):
+                with mock.patch("urllib.request.urlopen") as urlopen_mock, mock.patch(
+                    "notifier.get_codepipeline_client"
+                ) as codepipeline_mock:
+                    cm = mock.MagicMock()
+                    cm.getcode.return_value = 200
+                    cm.read.return_value = b"ok"
+                    urlopen_mock.return_value = cm
 
-        codepipeline_mock.return_value = boto3.client("codepipeline")
-        with Stubber(codepipeline_mock.return_value) as stubber:
-            stubber.add_response("get_pipeline_execution", **PIPELINE_EXECUTION)
-            notifier.handler(event=TEST_EVENT, context={})
+                    codepipeline_mock.return_value = boto3.client("codepipeline")
+                    with Stubber(codepipeline_mock.return_value) as stubber:
+                        stubber.add_response(
+                            "get_pipeline_execution", **PIPELINE_EXECUTION
+                        )
+                        notifier.handler(event=wrap_event(event), context={})
 
-        urlopen_mock.assert_called_once()
-        request = urlopen_mock.call_args[0][0]
-        self.assertEqual(request.full_url, ENVIRONMENT["SLACK_WEBHOOK_URL"])
-        self.assertEqual(request.get_header("Content-type"), "application/json")
-        self.assertEqual(
-            json.loads(request.data),
-            {
-                "channel": "#notifications",
-                "username": "Mr. Robot",
-                "icon_emoji": ":rocket:",
-                "text": "*Deployment* of *kjagiello-qa-homepage* has started.",
-                "attachments": [
-                    {
-                        "color": "#1a9edb",
-                        "fallback": "`kjagiello-qa-homepage` has `STARTED`",
-                        "fields": [
-                            {"title": "Pipeline", "value": "kjagiello-qa-homepage"},
-                            {
-                                "title": "Execution ID",
-                                "value": (
-                                    "<https://eu-west-1.console.aws.amazon.com/"
-                                    "codesuite/codepipeline/pipelines/kjagiello-"
-                                    "qa-homepage/executions/0aeb1e48-4de1-4d3c-"
-                                    "8815-4a8a701b1fcc/timeline?region=eu-west-1|"
-                                    "0aeb1e48-4de1-4d3c-8815-4a8a701b1fcc>"
-                                ),
-                            },
-                            {"title": "Environment", "value": "QA", "short": True},
-                            {"title": "Region", "value": "eu-west-1", "short": True},
-                            {
-                                "title": "Code revision",
-                                "value": (
-                                    "commit message\n\n"
-                                    "<http://foo.bar|View the changeset>"
-                                ),
-                            },
-                        ],
-                    }
-                ],
-            },
-        )
+                    urlopen_mock.assert_called_once()
+                    request = urlopen_mock.call_args[0][0]
+                    self.assertEqual(request.full_url, ENVIRONMENT["SLACK_WEBHOOK_URL"])
+                    self.assertEqual(
+                        request.get_header("Content-type"), "application/json"
+                    )
+                    self.assertEqual(
+                        json.loads(request.data),
+                        slack_message,
+                    )
 
     @mock.patch("urllib.request.urlopen")
     @mock.patch("notifier.get_codepipeline_client")
@@ -158,7 +309,7 @@ class TestNotifier(unittest.TestCase):
         codepipeline_mock.return_value = boto3.client("codepipeline")
         with Stubber(codepipeline_mock.return_value) as stubber:
             stubber.add_response("get_pipeline_execution", **pipeline_execution)
-            notifier.handler(event=TEST_EVENT, context={})
+            notifier.handler(event=wrap_event(TEST_PIPELINE_UPDATE), context={})
 
         urlopen_mock.assert_called_once()
         request = urlopen_mock.call_args[0][0]

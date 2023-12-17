@@ -66,7 +66,11 @@ def format_slack_attachment(
         ]
     return {
         "color": STATE_COLORS[action][pipeline_state],
-        "fallback": (f"`{pipeline_name}` has `{pipeline_state}`"),
+        "fallback": format_slack_text(
+            pipeline_name=pipeline_name,
+            pipeline_state=pipeline_state,
+            action=action,
+        ).replace("*", ""),
         "fields": [
             {"title": "Pipeline", "value": pipeline_name},
             {"title": "Execution ID", "value": execution_link},
@@ -80,11 +84,11 @@ def format_slack_attachment(
 def format_slack_text(*, pipeline_name: str, pipeline_state: str, action: str):
     if action == "Approval":
         if pipeline_state == "STARTED":
-            return f"*{pipeline_name}* is awaiting approval."
+            return f"*Deployment* of *{pipeline_name}* is awaiting approval."
         elif pipeline_state == "FAILED":
-            return f"*{pipeline_name}* has rejected."
+            return f"*Deployment* of *{pipeline_name}* has been rejected."
         elif pipeline_state == "SUCCEEDED":
-            return f"*{pipeline_name}* has been approved."
+            return f"*Deployment* of *{pipeline_name}* has been approved."
     return f"*{action}* of *{pipeline_name}* has {pipeline_state.lower()}."
 
 
