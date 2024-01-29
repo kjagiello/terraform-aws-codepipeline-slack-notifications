@@ -89,7 +89,7 @@ data "archive_file" "notifier_package" {
 }
 
 resource "aws_lambda_function" "pipeline_notification" {
-  filename         = "${path.module}/lambdas/notifier.zip"
+  filename         = data.archive_file.notifier_package.output_path
   function_name    = module.this.id
   role             = aws_iam_role.pipeline_notification.arn
   runtime          = "python3.8"
