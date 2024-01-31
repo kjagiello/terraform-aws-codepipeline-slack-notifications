@@ -85,7 +85,7 @@ data "aws_iam_policy_document" "pipeline_updates_policy" {
 data "archive_file" "notifier_package" {
   type        = "zip"
   source_file = "${path.module}/lambdas/notifier/notifier.py"
-  output_file_mode = "0666"
+  output_file_mode = "0777"
   output_path = "${path.module}/lambdas/notifier.zip"
 }
 
