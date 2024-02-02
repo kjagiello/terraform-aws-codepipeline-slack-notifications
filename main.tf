@@ -83,13 +83,14 @@ data "aws_iam_policy_document" "pipeline_updates_policy" {
 }
 
 data "archive_file" "notifier_package" {
-  type        = "zip"
-  source_file = "${path.module}/lambdas/notifier/notifier.py"
-  output_path = "${path.module}/lambdas/notifier.zip"
+  type             = "zip"
+  source_file      = "${path.module}/lambdas/notifier/notifier.py"
+  output_file_mode = "0666"
+  output_path      = "${path.module}/lambdas/notifier.zip"
 }
 
 resource "aws_lambda_function" "pipeline_notification" {
-  filename         = "${path.module}/lambdas/notifier.zip"
+  filename         = data.archive_file.notifier_package.output_path
   function_name    = module.this.id
   role             = aws_iam_role.pipeline_notification.arn
   runtime          = "python3.8"
