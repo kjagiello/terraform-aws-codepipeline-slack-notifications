@@ -37,7 +37,7 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         S3Bucket    = aws_s3_bucket.source_bucket.bucket
-        S3ObjectKey = aws_s3_bucket_object.source_object.key
+        S3ObjectKey = aws_s3_object.source_object.key
       }
     }
   }
@@ -60,37 +60,74 @@ resource "aws_codepipeline" "codepipeline" {
 
 resource "aws_s3_bucket" "artifact_bucket" {
   # tfsec:ignore:AWS002
-  bucket = "notifications-test-artifact-bucket"
-  acl    = "private"
+  bucket        = "notifications-test-artifact-bucket"
+  force_destroy = true
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+resource "aws_s3_bucket_ownership_controls" "artifact_bucket" {
+  bucket = aws_s3_bucket.artifact_bucket.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "artifact_bucket" {
+  depends_on = [aws_s3_bucket_ownership_controls.artifact_bucket]
+
+  bucket = aws_s3_bucket.artifact_bucket.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "artifact_bucket" {
+  bucket = aws_s3_bucket.artifact_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
   }
 }
 
 resource "aws_s3_bucket" "source_bucket" {
   # tfsec:ignore:AWS002
-  bucket = "notifications-test-source-bucket"
-  acl    = "private"
+  bucket        = "notifications-test-source-bucket"
+  force_destroy = true
+}
 
-  versioning {
-    enabled = true
+resource "aws_s3_bucket_ownership_controls" "source_bucket" {
+  bucket = aws_s3_bucket.source_bucket.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
   }
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+resource "aws_s3_bucket_acl" "source_bucket" {
+  depends_on = [aws_s3_bucket_ownership_controls.source_bucket]
+
+  bucket = aws_s3_bucket.source_bucket.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "source_bucket" {
+  bucket = aws_s3_bucket.source_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
   }
 }
 
-resource "aws_s3_bucket_object" "source_object" {
+resource "aws_s3_bucket_versioning" "source_bucket" {
+  bucket = aws_s3_bucket.source_bucket.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_object" "source_object" {
   bucket  = aws_s3_bucket.source_bucket.bucket
   key     = "test"
   content = "test"

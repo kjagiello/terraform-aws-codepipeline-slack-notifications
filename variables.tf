@@ -25,17 +25,58 @@ variable "slack_emoji" {
   default     = ":rocket:"
 }
 
-variable "event_type_ids" {
-  type        = list(any)
-  description = "The list of event type to trigger a notification on"
+variable "pipeline_event_type_ids" {
+  type        = list(string)
+  description = "The list of pipeline events to trigger a notification on"
   default = [
-    "codepipeline-pipeline-pipeline-execution-failed",
-    "codepipeline-pipeline-pipeline-execution-canceled",
-    "codepipeline-pipeline-pipeline-execution-started",
-    "codepipeline-pipeline-pipeline-execution-resumed",
-    "codepipeline-pipeline-pipeline-execution-succeeded",
-    "codepipeline-pipeline-pipeline-execution-superseded"
+    "started",
+    "failed",
+    "canceled",
+    "resumed",
+    "succeeded",
+    "superseded"
   ]
+
+  validation {
+    condition = length(
+      setsubtract(var.pipeline_event_type_ids, [
+        "started",
+        "failed",
+        "canceled",
+        "resumed",
+        "succeeded",
+        "superseded"
+      ])
+    ) == 0
+    error_message = <<-EOF
+    Invalid event type IDs found.
+    Allowed type IDs: started, failed, canceled, resumed, succeeded, superseded.
+    EOF
+  }
+}
+
+variable "approval_event_type_ids" {
+  type        = list(string)
+  description = "The list of pipeline events to trigger a notification on"
+  default = [
+    "started",
+    "succeeded",
+    "failed",
+  ]
+
+  validation {
+    condition = length(
+      setsubtract(var.approval_event_type_ids, [
+        "started",
+        "succeeded",
+        "failed",
+      ])
+    ) == 0
+    error_message = <<-EOF
+    Invalid event type IDs found.
+    Allowed type IDs: started, succeeded, failed.
+    EOF
+  }
 }
 
 variable "lambda_runtime" {
