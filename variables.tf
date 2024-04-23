@@ -37,3 +37,9 @@ variable "event_type_ids" {
     "codepipeline-pipeline-pipeline-execution-superseded"
   ]
 }
+
+variable "lambda_runtime" {
+  type        = string
+  description = "The runtime to use for the lambda function"
+  default     = "python3.8"
+}
