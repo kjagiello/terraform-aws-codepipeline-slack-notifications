@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import typing as t
 import urllib
 import urllib.request
 
@@ -39,8 +38,8 @@ def format_slack_attachment(
     environment: str,
     region: str,
     action: str,
-    revision_summary: t.Optional[str],
-    revision_url: t.Optional[str],
+    revision_summary: str | None,
+    revision_url: str | None,
 ) -> dict:
     execution_link = (
         f"<https://{region}.console.aws.amazon.com/codesuite/codepipeline/"

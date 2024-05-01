@@ -82,5 +82,5 @@ variable "approval_event_type_ids" {
 variable "lambda_runtime" {
   type        = string
   description = "The runtime to use for the lambda function"
-  default     = "python3.8"
+  default     = "python3.12"
 }
